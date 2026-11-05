@@ -102,7 +102,6 @@
         const tg = window.Telegram?.WebApp;
         let userData = { name: "Player", username: "player_1", id: 12345 };
         
-        // Put your exact Telegram Bot Username here (without @)
         const BOT_USERNAME = "roast_flex_bot"; 
 
         if (tg) {
@@ -205,7 +204,7 @@
             }
         }
 
-        // AdsGram SDK Initialization Controller (Using your block ID)
+        // AdsGram SDK Initialization Controller
         let adController = null;
         if (window.AdsGram) {
             try {
@@ -219,7 +218,7 @@
             if (adController) {
                 adController.show()
                     .then((result) => {
-                        // Ad completed successfully - Reward user
+                        // Ad completed successfully - Only now reward user
                         saveCoins(userCoins + 200);
                         alert("Reward Unlocked! +200 Coins added to your account.");
                         if (tg?.HapticFeedback) {
@@ -227,14 +226,12 @@
                         }
                     })
                     .catch((err) => {
-                        // Ad closed or failed
+                        // Ad closed or failed - NO coins added
                         console.warn("Ad skipped or failed:", err);
-                        alert("Ad was closed before completion. No reward granted.");
+                        alert("Ad was closed or failed to load. No reward granted.");
                     });
             } else {
-                // Fallback simulation only if AdsGram library fails to load completely
-                saveCoins(userCoins + 200);
-                alert("+200 Coins added (Fallback mode active)!");
+                alert("AdsGram SDK not ready. Please open this app inside Telegram mobile app.");
             }
         }
     </script>
