@@ -44,7 +44,7 @@
     <main class="my-auto py-6 space-y-5">
         <div class="text-center space-y-1.5">
             <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] px-3 py-1 rounded-full uppercase tracking-wider font-bold">
-                🔥 Viral AI Engine v2.5
+                🔥 Viral AI Engine v3.0
             </span>
             <h2 class="text-2xl font-black tracking-tight text-white">Roast or Flex?</h2>
             <p class="text-xs text-slate-400 max-w-xs mx-auto">Get brutally roasted by AI or flex your elite status to your group chats.</p>
@@ -57,7 +57,7 @@
             </p>
         </div>
 
-        <!-- Share Generated Content Button (Hidden initially) -->
+        <!-- Share Generated Content Button -->
         <div id="share-content-container" class="hidden">
             <button onclick="shareGeneratedResult()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black py-3 px-4 rounded-xl shadow-lg text-xs flex items-center justify-center gap-2 active:scale-95 transition-all uppercase tracking-wider">
                 🚀 Share This Result To Telegram Chat
@@ -99,9 +99,7 @@
         // Telegram WebApp Initialization
         const tg = window.Telegram?.WebApp;
         let userData = { name: "Player", username: "player_1", id: 12345 };
-        let userCoins = 300;
-        let currentGeneratedText = "";
-
+        
         // Put your exact Telegram Bot Username here (without @)
         const BOT_USERNAME = "roast_flex_bot"; 
 
@@ -116,12 +114,26 @@
                     id: u.id
                 };
             }
-            
-            // Check for Referral Start Parameter
-            const startParam = tg.initDataUnsafe?.start_param;
+        }
+
+        // Load or Initialize User Coins using localStorage (Persists on refresh)
+        let userCoins = localStorage.getItem('roast_coins_' + userData.id);
+        if (userCoins === null) {
+            userCoins = 300; // Initial signup bonus
+            // Check for Referral Parameter on first load
+            const startParam = tg?.initDataUnsafe?.start_param;
             if (startParam) {
-                userCoins += 500;
+                userCoins += 500; // Referral bonus
             }
+            localStorage.setItem('roast_coins_' + userData.id, userCoins);
+        } else {
+            userCoins = parseInt(userCoins);
+        }
+
+        function saveCoins(newAmount) {
+            userCoins = newAmount;
+            localStorage.setItem('roast_coins_' + userData.id, userCoins);
+            document.getElementById('coin-balance').innerText = userCoins;
         }
 
         // Update UI with User Data & Coins
@@ -130,21 +142,27 @@
         document.getElementById('user-avatar').innerText = userData.name.charAt(0).toUpperCase();
         document.getElementById('coin-balance').innerText = userCoins;
 
-        // Expanded Viral Content Bank
+        // Massive & Varied Viral Content Bank
         const roasts = [
-            `@${userData.username}, your screen time is higher than your bank balance!`,
+            `@${userData.username}, your screen time is higher than your monthly bank savings!`,
             `AI Analysis: 99% chance you ghost people after asking 'Kahan ho?'.`,
-            `Your playlist consists of sad songs you've never actually related to.`,
-            `You spend more time organizing your apps than actually working on your goals.`,
-            `Even your phone's battery drains faster than your motivation levels.`
+            `Your playlist consists of sad songs you've never actually related to in real life.`,
+            `You spend more time organizing your phone apps than actually working on your goals.`,
+            `Even your phone's battery drains faster than your motivation levels on a Monday morning.`,
+            `@${userData.username}, you type 'On my way' while still lying in your bed scrolling reels.`,
+            `Your browser history looks like a crime scene of random midnight searches.`
         ];
 
         const flexes = [
             `👑 ELITE STATUS: @${userData.username} operates in the top 1% alpha network. Unstoppable aura.`,
             `🚀 LEGENDARY: High-value mindset detected. Your future is printing wealth automatically.`,
-            `🔥 ALPHA VIBE: Certified mastermind. People copy your moves when you aren't looking.`,
-            `💎 BOSS LEVEL: Unmatched focus, absolute execution power. Greatness incoming!`
+            `🔥 ALPHA VIBE: Certified mastermind. People secretly copy your moves when you aren't looking.`,
+            `💎 BOSS LEVEL: Unmatched focus, absolute execution power. Greatness is incoming!`,
+            `⚡ GOD-TIER ENERGY: @${userData.username} turns every ordinary project into an absolute masterpiece.`,
+            `🌟 UNSTOPPABLE: Built different, thinking ahead of the curve. Pure success blueprint.`
         ];
+
+        let currentGeneratedText = "";
 
         function generateContent(type) {
             if (userCoins < 10) {
@@ -152,8 +170,7 @@
                 return;
             }
 
-            userCoins -= 10;
-            document.getElementById('coin-balance').innerText = userCoins;
+            saveCoins(userCoins - 10);
 
             const list = type === 'roast' ? roasts : flexes;
             currentGeneratedText = list[Math.floor(Math.random() * list.length)];
@@ -194,8 +211,7 @@
         }
 
         function watchAdForCoins() {
-            userCoins += 200;
-            document.getElementById('coin-balance').innerText = userCoins;
+            saveCoins(userCoins + 200);
             alert("Reward Unlocked! +200 Coins added to your account.");
             
             if (tg?.HapticFeedback) {
