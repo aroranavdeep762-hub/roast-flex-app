@@ -204,29 +204,27 @@
             }
         }
 
-        // AdsGram SDK Pre-load Controller
-        let adController = null;
-
-        window.addEventListener('load', () => {
-            if (window.AdsGram) {
-                try {
-                    adController = window.AdsGram.init({ blockId: "int-58167" });
-                } catch (e) {
-                    console.error("AdsGram init exception:", e);
-                }
-            }
-        });
-
+        // Dynamic AdsGram Loader & Handler
         function watchAdsGramAd() {
-            if (!adController && window.AdsGram) {
-                try {
-                    adController = window.AdsGram.init({ blockId: "int-58167" });
-                } catch (e) {
-                    console.error("Late init error:", e);
-                }
+            if (typeof window.AdsGram !== 'undefined') {
+                triggerAd();
+            } else {
+                // Dynamically inject script if missing
+                const script = document.createElement('script');
+                script.src = "https://sad.adsgram.ai/js/sad.min.js";
+                script.onload = () => {
+                    triggerAd();
+                };
+                script.onerror = () => {
+                    alert("Failed to connect to AdsGram network. Please check your internet connection.");
+                };
+                document.head.appendChild(script);
             }
+        }
 
-            if (adController) {
+        function triggerAd() {
+            try {
+                const adController = window.AdsGram.init({ blockId: "int-58167" });
                 adController.show()
                     .then((result) => {
                         saveCoins(userCoins + 200);
@@ -239,8 +237,9 @@
                         console.warn("Ad skipped or failed:", err);
                         alert("Ad was closed or failed to load. No reward granted.");
                     });
-            } else {
-                alert("AdsGram SDK is still loading or unavailable. Please ensure you are inside Telegram mobile app with a stable connection.");
+            } catch (e) {
+                console.error("AdsGram trigger error:", e);
+                alert("AdsGram initialization error. Please try again.");
             }
         }
     </script>
