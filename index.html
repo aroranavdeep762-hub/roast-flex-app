@@ -205,26 +205,36 @@
             }
         }
 
-        // AdsGram Rewarded Ad Integration Controller
-        const adController = window.AdsGram ? window.AdsGram.init({ blockId: "58167" }) : null;
+        // AdsGram SDK Initialization Controller (Using your block ID)
+        let adController = null;
+        if (window.AdsGram) {
+            try {
+                adController = window.AdsGram.init({ blockId: "58167" });
+            } catch (e) {
+                console.error("AdsGram init error:", e);
+            }
+        }
 
         function watchAdsGramAd() {
             if (adController) {
-                adController.show().then(() => {
-                    // Ad completed successfully - Reward user
-                    saveCoins(userCoins + 200);
-                    alert("Reward Unlocked! +200 Coins added to your account.");
-                    if (tg?.HapticFeedback) {
-                        tg.HapticFeedback.notificationOccurred('success');
-                    }
-                }).catch((result) => {
-                    // Ad skipped or failed
-                    alert("Ad was closed before completion. No reward granted.");
-                });
+                adController.show()
+                    .then((result) => {
+                        // Ad completed successfully - Reward user
+                        saveCoins(userCoins + 200);
+                        alert("Reward Unlocked! +200 Coins added to your account.");
+                        if (tg?.HapticFeedback) {
+                            tg.HapticFeedback.notificationOccurred('success');
+                        }
+                    })
+                    .catch((err) => {
+                        // Ad closed or failed
+                        console.warn("Ad skipped or failed:", err);
+                        alert("Ad was closed before completion. No reward granted.");
+                    });
             } else {
-                // Fallback simulation if AdsGram script fails to load on desktop browser
+                // Fallback simulation only if AdsGram library fails to load completely
                 saveCoins(userCoins + 200);
-                alert("+200 Coins added!");
+                alert("+200 Coins added (Fallback mode active)!");
             }
         }
     </script>
