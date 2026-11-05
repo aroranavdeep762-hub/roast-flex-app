@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Roast & Flex - AI Telegram App</title>
+    <!-- Telegram WebApp SDK -->
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            background-color: #0f172a;
+            color: #f8fafc;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            touch-action: manipulation;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between p-4 pb-8">
+
+    <!-- Header Section -->
+    <header class="flex items-center justify-between py-2 border-b border-slate-800">
+        <div class="flex items-center space-x-2">
+            <div id="user-avatar" class="w-10 h-10 rounded-full bg-indigo-600 flex items-center justify-center font-bold text-lg">
+                U
+            </div>
+            <div>
+                <h1 id="user-name" class="font-bold text-sm">User</h1>
+                <p id="user-handle" class="text-xs text-slate-400">@username</p>
+            </div>
+        </div>
+        <div class="bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs px-3 py-1.5 rounded-full font-semibold flex items-center gap-1">
+            ⚡ <span id="coin-balance">100</span> Coins
+        </div>
+    </header>
+
+    <!-- Main Content Area -->
+    <main class="my-auto py-6 space-y-6">
+        <div class="text-center space-y-2">
+            <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-xs px-3 py-1 rounded-full uppercase tracking-wider font-semibold">
+                AI Powered Viral Engine
+            </span>
+            <h2 class="text-2xl font-black tracking-tight text-white">Roast or Flex?</h2>
+            <p class="text-xs text-slate-400 max-w-xs mx-auto">Discover your brutal AI reality check or flex your status to your friends.</p>
+        </div>
+
+        <!-- Result Card Output Area -->
+        <div id="output-box" class="glass-card rounded-2xl p-5 min-h-[160px] flex flex-col justify-center items-center text-center relative overflow-hidden">
+            <p id="result-text" class="text-slate-300 italic text-sm">
+                "Click a button below to generate your personalized AI reality check..."
+            </p>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="grid grid-cols-2 gap-3">
+            <button onclick="generateContent('roast')" class="bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg text-sm flex items-center justify-center gap-2 active:scale-95 transition-all">
+                🔥 Roast Me
+            </button>
+            <button onclick="generateContent('flex')" class="bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold py-3.5 px-4 rounded-xl shadow-lg text-sm flex items-center justify-center gap-2 active:scale-95 transition-all">
+                💎 Flex Status
+            </button>
+        </div>
+
+        <!-- Viral Growth Section -->
+        <div class="glass-card rounded-xl p-4 space-y-3">
+            <div class="flex justify-between items-center text-xs">
+                <span class="font-semibold text-slate-200">Invite Friends & Earn</span>
+                <span class="text-indigo-400 font-bold">+500 Coins/Ref</span>
+            </div>
+            <button onclick="shareInviteLink()" class="w-full bg-indigo-600 hover:bg-indigo-500 text-white font-bold py-2.5 rounded-lg text-xs flex items-center justify-center gap-2 active:scale-95 transition-all">
+                📲 Invite Telegram Friends
+            </button>
+        </div>
+    </main>
+
+    <!-- Footer Ad / Task Placeholder -->
+    <footer class="text-center space-y-2">
+        <button onclick="watchAdForCoins()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-400 font-semibold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2">
+            📺 Watch Ad (+200 Coins)
+        </button>
+        <p class="text-[10px] text-slate-500">Powered by Telegram WebApp & AI</p>
+    </footer>
+
+    <script>
+        // Telegram WebApp Initialization
+        const tg = window.Telegram?.WebApp;
+        let userData = { name: "Guest User", username: "guest", id: 0 };
+
+        if (tg) {
+            tg.ready();
+            tg.expand();
+            if (tg.initDataUnsafe?.user) {
+                const u = tg.initDataUnsafe.user;
+                userData = {
+                    name: u.first_name + (u.last_name ? " " + u.last_name : ""),
+                    username: u.username || "no_username",
+                    id: u.id
+                };
+            }
+        }
+
+        // Update UI with User Data
+        document.getElementById('user-name').innerText = userData.name;
+        document.getElementById('user-handle').innerText = '@' + userData.username;
+        document.getElementById('user-avatar').innerText = userData.name.charAt(0).toUpperCase();
+
+        // Sample Offline Mock Responses (Database / AI Integration Point)
+        const roasts = [
+            `Hey @${userData.username}, your screen time is higher than your monthly savings!`,
+            `Profile says 'Entrepreneur', but your bio screams 'I spend 8 hours on Telegram bots'.`,
+            `AI checked your account... 99% chance you mute group chats after sending one message.`
+        ];
+
+        const flexes = [
+            `👑 STATUS: High-Value Member. @${userData.username} operates in the top 1% alpha energy.`,
+            `🚀 LEGEND LEVEL: 99.9% Telegram Activity Score unlocked. Unstoppable momentum.`,
+            `🔥 VIBE CHECK: 100% Certified Hustler. @${userData.username} is building the future.`
+        ];
+
+        function generateContent(type) {
+            const list = type === 'roast' ? roasts : flexes;
+            const randomItem = list[Math.floor(Math.random() * list.length)];
+            const outputBox = document.getElementById('result-text');
+            
+            outputBox.innerText = `"${randomItem}"`;
+            
+            // Trigger Haptic Feedback in Telegram App
+            if (tg?.HapticFeedback) {
+                tg.HapticFeedback.impactOccurred('medium');
+            }
+        }
+
+        function shareInviteLink() {
+            const botUsername = "YourAppBot"; // Replace with your bot username
+            const shareUrl = `https://t.me/share/url?url=https://t.me/${botUsername}?start=${userData.id}&text=Roast%20my%20profile%20or%20check%20your%20flex%20score%20now!🔥`;
+            if (tg?.openTelegramLink) {
+                tg.openTelegramLink(shareUrl);
+            } else {
+                window.open(shareUrl, '_blank');
+            }
+        }
+
+        function watchAdForCoins() {
+            alert("AdsGram SDK Integration point: User watches 30s rewarded video ad here.");
+        }
+    </script>
+</body>
+</html>
