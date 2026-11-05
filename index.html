@@ -6,6 +6,8 @@
     <title>Roast & Flex - AI Telegram App</title>
     <!-- Telegram WebApp SDK -->
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <!-- AdsGram SDK Script -->
+    <script src="https://sad.adsgram.ai/js/sad.min.js"></script>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
@@ -44,7 +46,7 @@
     <main class="my-auto py-6 space-y-5">
         <div class="text-center space-y-1.5">
             <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] px-3 py-1 rounded-full uppercase tracking-wider font-bold">
-                🔥 Viral AI Engine v3.0
+                🔥 Viral AI Engine v3.5 (AdsLive)
             </span>
             <h2 class="text-2xl font-black tracking-tight text-white">Roast or Flex?</h2>
             <p class="text-xs text-slate-400 max-w-xs mx-auto">Get brutally roasted by AI or flex your elite status to your group chats.</p>
@@ -87,12 +89,12 @@
         </div>
     </main>
 
-    <!-- Footer Ad / Task Placeholder -->
+    <!-- Footer Ad / Task Section -->
     <footer class="text-center space-y-2">
-        <button onclick="watchAdForCoins()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-400 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-95 transition-all">
-            📺 Watch Ad (+200 Coins)
+        <button onclick="watchAdsGramAd()" class="w-full bg-slate-800 hover:bg-slate-700 border border-slate-700 text-amber-400 font-bold py-2.5 rounded-xl text-xs flex items-center justify-center gap-2 active:scale-95 transition-all shadow-md">
+            📺 Watch Ad & Earn (+200 Coins)
         </button>
-        <p class="text-[10px] text-slate-500">Secured & Powered by Telegram Mini Apps</p>
+        <p class="text-[10px] text-slate-500">Secured & Powered by Telegram Mini Apps & AdsGram</p>
     </footer>
 
     <script>
@@ -116,14 +118,13 @@
             }
         }
 
-        // Load or Initialize User Coins using localStorage (Persists on refresh)
+        // Load or Initialize User Coins using localStorage
         let userCoins = localStorage.getItem('roast_coins_' + userData.id);
         if (userCoins === null) {
-            userCoins = 300; // Initial signup bonus
-            // Check for Referral Parameter on first load
+            userCoins = 300; 
             const startParam = tg?.initDataUnsafe?.start_param;
             if (startParam) {
-                userCoins += 500; // Referral bonus
+                userCoins += 500; 
             }
             localStorage.setItem('roast_coins_' + userData.id, userCoins);
         } else {
@@ -136,30 +137,26 @@
             document.getElementById('coin-balance').innerText = userCoins;
         }
 
-        // Update UI with User Data & Coins
         document.getElementById('user-name').innerText = userData.name;
         document.getElementById('user-handle').innerText = '@' + userData.username;
         document.getElementById('user-avatar').innerText = userData.name.charAt(0).toUpperCase();
         document.getElementById('coin-balance').innerText = userCoins;
 
-        // Massive & Varied Viral Content Bank
+        // Content Bank
         const roasts = [
             `@${userData.username}, your screen time is higher than your monthly bank savings!`,
             `AI Analysis: 99% chance you ghost people after asking 'Kahan ho?'.`,
             `Your playlist consists of sad songs you've never actually related to in real life.`,
             `You spend more time organizing your phone apps than actually working on your goals.`,
             `Even your phone's battery drains faster than your motivation levels on a Monday morning.`,
-            `@${userData.username}, you type 'On my way' while still lying in your bed scrolling reels.`,
-            `Your browser history looks like a crime scene of random midnight searches.`
+            `@${userData.username}, you type 'On my way' while still lying in your bed scrolling reels.`
         ];
 
         const flexes = [
             `👑 ELITE STATUS: @${userData.username} operates in the top 1% alpha network. Unstoppable aura.`,
             `🚀 LEGENDARY: High-value mindset detected. Your future is printing wealth automatically.`,
             `🔥 ALPHA VIBE: Certified mastermind. People secretly copy your moves when you aren't looking.`,
-            `💎 BOSS LEVEL: Unmatched focus, absolute execution power. Greatness is incoming!`,
-            `⚡ GOD-TIER ENERGY: @${userData.username} turns every ordinary project into an absolute masterpiece.`,
-            `🌟 UNSTOPPABLE: Built different, thinking ahead of the curve. Pure success blueprint.`
+            `💎 BOSS LEVEL: Unmatched focus, absolute execution power. Greatness is incoming!`
         ];
 
         let currentGeneratedText = "";
@@ -178,10 +175,8 @@
             const outputBox = document.getElementById('result-text');
             outputBox.innerText = `"${currentGeneratedText}"`;
             
-            // Show the share button
             document.getElementById('share-content-container').classList.remove('hidden');
 
-            // Trigger Telegram Haptic Feedback
             if (tg?.HapticFeedback) {
                 tg.HapticFeedback.impactOccurred('medium');
             }
@@ -210,12 +205,26 @@
             }
         }
 
-        function watchAdForCoins() {
-            saveCoins(userCoins + 200);
-            alert("Reward Unlocked! +200 Coins added to your account.");
-            
-            if (tg?.HapticFeedback) {
-                tg.HapticFeedback.notificationOccurred('success');
+        // AdsGram Rewarded Ad Integration Controller
+        const adController = window.AdsGram ? window.AdsGram.init({ blockId: "YOUR_ADSGRAM_BLOCK_ID" }) : null;
+
+        function watchAdsGramAd() {
+            if (adController) {
+                adController.show().then(() => {
+                    // Ad completed successfully - Reward user
+                    saveCoins(userCoins + 200);
+                    alert("Reward Unlocked! +200 Coins added to your account.");
+                    if (tg?.HapticFeedback) {
+                        tg.HapticFeedback.notificationOccurred('success');
+                    }
+                }).catch((result) => {
+                    // Ad skipped or failed
+                    alert("Ad was closed before completion. No reward granted.");
+                });
+            } else {
+                // Fallback simulation if AdsGram script fails to load on desktop browser
+                saveCoins(userCoins + 200);
+                alert("Test Mode: +200 Coins added! (Replace 'YOUR_ADSGRAM_BLOCK_ID' with your real AdsGram ID for production).");
             }
         }
     </script>
