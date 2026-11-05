@@ -44,7 +44,7 @@
     <main class="my-auto py-6 space-y-5">
         <div class="text-center space-y-1.5">
             <span class="bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 text-[10px] px-3 py-1 rounded-full uppercase tracking-wider font-bold">
-                🔥 Viral AI Engine v2.0
+                🔥 Viral AI Engine v2.5
             </span>
             <h2 class="text-2xl font-black tracking-tight text-white">Roast or Flex?</h2>
             <p class="text-xs text-slate-400 max-w-xs mx-auto">Get brutally roasted by AI or flex your elite status to your group chats.</p>
@@ -55,6 +55,13 @@
             <p id="result-text" class="text-slate-200 font-medium text-sm leading-relaxed">
                 "Tap a button below to generate your instant AI reality check..."
             </p>
+        </div>
+
+        <!-- Share Generated Content Button (Hidden initially) -->
+        <div id="share-content-container" class="hidden">
+            <button onclick="shareGeneratedResult()" class="w-full bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-400 hover:to-orange-400 text-slate-950 font-black py-3 px-4 rounded-xl shadow-lg text-xs flex items-center justify-center gap-2 active:scale-95 transition-all uppercase tracking-wider">
+                🚀 Share This Result To Telegram Chat
+            </button>
         </div>
 
         <!-- Action Buttons -->
@@ -93,6 +100,10 @@
         const tg = window.Telegram?.WebApp;
         let userData = { name: "Player", username: "player_1", id: 12345 };
         let userCoins = 300;
+        let currentGeneratedText = "";
+
+        // Put your exact Telegram Bot Username here (without @)
+        const BOT_USERNAME = "roast_flex_bot"; 
 
         if (tg) {
             tg.ready();
@@ -109,7 +120,7 @@
             // Check for Referral Start Parameter
             const startParam = tg.initDataUnsafe?.start_param;
             if (startParam) {
-                userCoins += 500; // Bonus for joining via referral
+                userCoins += 500;
             }
         }
 
@@ -145,20 +156,35 @@
             document.getElementById('coin-balance').innerText = userCoins;
 
             const list = type === 'roast' ? roasts : flexes;
-            const randomItem = list[Math.floor(Math.random() * list.length)];
+            currentGeneratedText = list[Math.floor(Math.random() * list.length)];
+            
             const outputBox = document.getElementById('result-text');
+            outputBox.innerText = `"${currentGeneratedText}"`;
             
-            outputBox.innerText = `"${randomItem}"`;
-            
+            // Show the share button
+            document.getElementById('share-content-container').classList.remove('hidden');
+
             // Trigger Telegram Haptic Feedback
             if (tg?.HapticFeedback) {
                 tg.HapticFeedback.impactOccurred('medium');
             }
         }
 
+        function shareGeneratedResult() {
+            if (!currentGeneratedText) return;
+            const textToShare = `Look what AI said about me! 😂\n\n"${currentGeneratedText}"\n\nTry it on yourself here:`;
+            const shareUrl = `https://t.me/share/url?url=https://t.me/${BOT_USERNAME}?start=ref_${userData.id}&text=${encodeURIComponent(textToShare)}`;
+            
+            if (tg?.openTelegramLink) {
+                tg.openTelegramLink(shareUrl);
+            } else {
+                window.open(shareUrl, '_blank');
+            }
+        }
+
         function shareInviteLink() {
-            const botUsername = "roast_flex_bot"; // Replace with your exact bot username from BotFather
-            const shareUrl = `https://t.me/share/url?url=https://t.me/${botUsername}?start=ref_${userData.id}&text=Get%20brutally%20roasted%20or%20flex%20your%20status%20instantly!%20Join%20now🔥`;
+            const shareText = "Get brutally roasted or flex your status instantly! Join now🔥";
+            const shareUrl = `https://t.me/share/url?url=https://t.me/${BOT_USERNAME}?start=ref_${userData.id}&text=${encodeURIComponent(shareText)}`;
             
             if (tg?.openTelegramLink) {
                 tg.openTelegramLink(shareUrl);
@@ -168,7 +194,6 @@
         }
 
         function watchAdForCoins() {
-            // AdsGram Integration Hook
             userCoins += 200;
             document.getElementById('coin-balance').innerText = userCoins;
             alert("Reward Unlocked! +200 Coins added to your account.");
