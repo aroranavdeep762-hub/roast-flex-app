@@ -206,7 +206,7 @@
         }
 
         // AdsGram Rewarded Ad Integration Controller
-        const adController = window.AdsGram ? window.AdsGram.init({ blockId: "YOUR_ADSGRAM_BLOCK_ID" }) : null;
+        const adController = window.AdsGram ? window.AdsGram.init({ blockId: "58160" }) : null;
 
         function watchAdsGramAd() {
             if (adController) {
@@ -224,7 +224,7 @@
             } else {
                 // Fallback simulation if AdsGram script fails to load on desktop browser
                 saveCoins(userCoins + 200);
-                alert("Test Mode: +200 Coins added! (Replace 'YOUR_ADSGRAM_BLOCK_ID' with your real AdsGram ID for production).");
+                alert("+200 Coins added!");
             }
         }
     </script>
