@@ -204,21 +204,31 @@
             }
         }
 
-        // AdsGram SDK Initialization Controller
+        // AdsGram SDK Pre-load Controller
         let adController = null;
-        if (window.AdsGram) {
-            try {
-                adController = window.AdsGram.init({ blockId: "58179" });
-            } catch (e) {
-                console.error("AdsGram init error:", e);
+
+        window.addEventListener('load', () => {
+            if (window.AdsGram) {
+                try {
+                    adController = window.AdsGram.init({ blockId: "int-58167" });
+                } catch (e) {
+                    console.error("AdsGram init exception:", e);
+                }
             }
-        }
+        });
 
         function watchAdsGramAd() {
+            if (!adController && window.AdsGram) {
+                try {
+                    adController = window.AdsGram.init({ blockId: "int-58167" });
+                } catch (e) {
+                    console.error("Late init error:", e);
+                }
+            }
+
             if (adController) {
                 adController.show()
                     .then((result) => {
-                        // Ad completed successfully - Only now reward user
                         saveCoins(userCoins + 200);
                         alert("Reward Unlocked! +200 Coins added to your account.");
                         if (tg?.HapticFeedback) {
@@ -226,12 +236,11 @@
                         }
                     })
                     .catch((err) => {
-                        // Ad closed or failed - NO coins added
                         console.warn("Ad skipped or failed:", err);
                         alert("Ad was closed or failed to load. No reward granted.");
                     });
             } else {
-                alert("AdsGram SDK not ready. Please open this app inside Telegram mobile app.");
+                alert("AdsGram SDK is still loading or unavailable. Please ensure you are inside Telegram mobile app with a stable connection.");
             }
         }
     </script>
